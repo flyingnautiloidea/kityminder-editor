@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.54 - 2016-05-19
+ * kityminder-editor - v1.0.54 - 2016-05-22
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2016 ; Licensed 
@@ -1385,7 +1385,7 @@ _p[14] = {
             minder.renderTo(this.selector);
             minder.setTheme(null);
             minder.select(minder.getRoot(), true);
-            minder.execCommand("text", "中心主题");
+            minder.execCommand("text", "超级马莉");
             // 导出给其它 Runtime 使用
             this.minder = minder;
         }
