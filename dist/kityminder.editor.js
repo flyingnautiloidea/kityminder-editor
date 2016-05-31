@@ -1,6 +1,6 @@
 /*!
  * ====================================================
- * kityminder-editor - v1.0.54 - 2016-05-22
+ * kityminder-editor - v1.0.54 - 2016-05-30
  * https://github.com/fex-team/kityminder-editor
  * GitHub: https://github.com/fex-team/kityminder-editor 
  * Copyright (c) 2016 ; Licensed 
@@ -1386,6 +1386,12 @@ _p[14] = {
             minder.setTheme(null);
             minder.select(minder.getRoot(), true);
             minder.execCommand("text", "超级马莉");
+
+            //根据传给url中的参数id是否为0，判断是否需要重新加载（如果不为0，需要建立get请求，根据返回json重新加载。）
+            var url = location.search;
+            alert(url+"url jack");
+            var json = {"root":{"data":{"id":"a8a4d6338cee","created":1463921018,"text":"superkongyix"},"children":[]},"template":"default","theme":"fresh-blue","version":"1.4.33"};
+            minder.importJson(json);
             // 导出给其它 Runtime 使用
             this.minder = minder;
         }
@@ -2188,7 +2194,7 @@ angular.module('kityminderEditor').run(['$templateCache', function($templateCach
 
 
   $templateCache.put('ui/directive/topTab/topTab.html',
-    "<tabset><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab></tabset>"
+    "<tabset><tab heading=\"{{ 'idea' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('idea')\" select=\"setCurTab('idea')\"><undo-redo editor=\"editor\"></undo-redo><append-node minder=\"minder\"></append-node><arrange minder=\"minder\"></arrange><operation minder=\"minder\"></operation><hyper-link minder=\"minder\"></hyper-link><image-btn minder=\"minder\"></image-btn><note-btn minder=\"minder\"></note-btn><priority-editor minder=\"minder\"></priority-editor><progress-editor minder=\"minder\"></progress-editor><resource-editor minder=\"minder\"></resource-editor></tab><tab heading=\"{{ 'appearence' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('appearance')\" select=\"setCurTab('appearance')\"><template-list minder=\"minder\" class=\"inline-directive\"></template-list><theme-list minder=\"minder\"></theme-list><layout minder=\"minder\" class=\"inline-directive\"></layout><style-operator minder=\"minder\" class=\"inline-directive\"></style-operator><font-operator minder=\"minder\" class=\"inline-directive\"></font-operator></tab><tab heading=\"{{ 'view' | lang: 'ui/tabs'; }}\" ng-click=\"toggleTopTab('view')\" select=\"setCurTab('view')\"><expand-level minder=\"minder\"></expand-level><select-all minder=\"minder\"></select-all><search-btn minder=\"minder\"></search-btn></tab><tab heading=\"{{ 'saveJson' | lang: 'ui/tabs'; }}\" ng-click=\"saveJson()\"></tab></tabset>"
   );
 
 
@@ -2444,6 +2450,7 @@ angular.module('kityminderEditor')
 					'redo': '重做 (Ctrl + Y)',
 
 					'tabs': {
+                        'saveJson':'保存',
 						'idea': '思路',
 						'appearence': '外观',
 						'view': '视图'
@@ -4118,6 +4125,17 @@ angular.module('kityminderEditor')
             }
         };
     }]);
+/**
+ * Created by nautiloidea on 5/29/16.
+ */
+angular.module('kityminderEditor')
+    .directive('saveJson', function() {
+
+        var minder = $scope.minder;
+        var jack = minder.exportJson();
+        alert(jack);
+
+    });
 angular.module('kityminderEditor')
     .directive('searchBox', function() {
         return {
@@ -4527,6 +4545,73 @@ angular.module('kityminderEditor')
                        top: '92px'
                    });
                }
+
+               scope.saveJson = function($http){
+                   var minder = scope.minder;
+                   var jack = JSON.stringify(minder.exportJson());
+
+                   //获取url参数,传过来的应该是id，本脚本通过get获取服务端相应的mind数据。（当然这个脚本是请求后端数据用的，需要单独设置一个操作入口。）
+
+
+
+                   alert("begin");
+
+                    //先使用http发送。
+                   var left;
+                   var right;
+                   var middle=[{},{}];
+                   var endFlag01=false;
+                   var endFlag02=false;
+
+                   var xmlhttp;
+                   var xmlhttp01;
+                   var xmlhttparray;
+                   if (window.XMLHttpRequest)
+                   {// code for IE7+, Firefox, Chrome, Opera, Safari
+                       xmlhttp=new XMLHttpRequest();
+                       xmlhttp01=new XMLHttpRequest();
+                       xmlhttparray=new XMLHttpRequest();
+                        alert(jack);
+
+                   }
+                   else
+                   {// code for IE6, IE5
+                       xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+                       xmlhttp01=new ActiveXObject("Microsoft.XMLHTTP");
+                       xmlhttparray=new ActiveXObject("Microsoft.XMLHTTP");
+
+
+                   }
+
+//                   var paramStr = JSON.toJSONString(jack);
+                   var encodedString = encodeURI(jack);
+                   var all="http://localhost:8080/tradedataservice/saveBaiduMind.do"+"?param="+encodedString;
+                   xmlhttp.open("POST",all,true);
+                   xmlhttp.send();
+                   xmlhttp.onreadystatechange=function()
+                   {
+                       if (xmlhttp.readyState==4 && xmlhttp.status==200)
+                       {
+                           alert("保存成功");
+                           console.log(xmlhttp.responseText.toString());
+//                           var mindOrigin = eval("(" + xmlhttp.responseText.toString() + ")");
+//                           console.log("mindOrigin"+mindOrigin);
+//                           var options = {
+//                               container:'jsmind_container',
+//                               editable:true,
+//                               theme:'orange'
+//                           }
+//                           var superman={"data":{"children":[{"children":[{"children":[{"id":"name0","topic":"tmall域名大购物车-查询商品"}],"id":"models0","topic":"大购物车"}],"direction":"right","id":"business0","topic":"UI购物车基础操作"},{"children":[{"children":[{"id":"name1","topic":"购物车中的一条记录，打开tmall mini购物车"}],"id":"models1","topic":"购物车查询"}],"direction":"left","id":"business1","topic":"tmall mini购物车"}],"id":"root","topic":"mindMap"},"format":"node_tree","meta":{"author":"ky","name":"justtry","version":"0.2"}};
+//                           _jm = jsMind.show(options,mindOrigin);
+
+                       }
+                   }
+//                   var json = {"root":{"data":{"id":"a8a4d6338cee","created":1463921018,"text":"superkongyix"},"children":[]},"template":"default","theme":"fresh-blue","version":"1.4.33"};
+//                   minder.importJson(json);
+
+
+               }
+
            }
        }
     });
